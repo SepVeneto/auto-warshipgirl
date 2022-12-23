@@ -10,14 +10,16 @@ CHOOSE = (908,787,1638,890)
 CONTINUE = (1483,828,1653,858)
 BACK = (1100,611,1273,654)
 AREA = (657,229,1561,821)
+REBACK = (1214,822,1384,887)
+CA = (265,462,1099,695)
 
 COUNT = 34
 
-# pyautogui.mouseInfo()
+pyautogui.mouseInfo()
 
-# im = pyautogui.screenshot()
-# om = im.crop(BATTLE)
-# om.save(r'D:\repo\auto-suml\screenshots\battle.png')
+im = pyautogui.screenshot()
+om = im.crop(CA)
+# om.save(r'D:\repo\auto-suml\screenshots\ca.png')
 
 class Back:
   def __init__(self, context) -> None:
@@ -29,6 +31,15 @@ class Back:
     self.context.action('back')
     COUNT -= 1
     # COUNT -= 1
+    self.context.current = Continue(self.context)
+
+class Reback:
+  def __init__(self, context) -> None:
+    self.context = context
+  def show(self):
+    print('撤退')
+  def run(self):
+    self.context.action('reback')
     self.context.current = Continue(self.context)
 
 class Continue:
@@ -51,9 +62,12 @@ class Continue:
     return False
 
   def checkBattle(self):
-    if self.context.getPos('battle'):
+    if self.context.getPos('battle') and self.context.getPos('ca'):
       self.context.current = Battle(self.context)
       return True
+    if self.context.getPos('reback') and not self.context.getPos('ca'):
+      self.context.current = Reback(self.context)
+      return False
     return False
 
   def checkStart(self):
