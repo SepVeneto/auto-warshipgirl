@@ -1,8 +1,11 @@
 from random import random
 from string import Template
-from PIL import Image
+import cv2
 import pyautogui
+import collections
 import time
+
+import win32gui
 
 START = (1367,824,1624,894)
 BATTLE = (1418,816,1656,897)
@@ -15,7 +18,10 @@ REBACK = (1214,823,1384,888)
 
 COUNT = 34
 
-# pyautogui.mouseInfo()
+# path = Template(r'D:\repo\auto-suml\screenshots\start.png')
+# res = pyautogui.locateOnScreen('D:/repo/auto-suml/screenshots/start.png')
+# print(res, path.safe_substitute(type=type))
+pyautogui.mouseInfo()
 
 # im = pyautogui.screenshot()
 # om = im.crop(REBACK)
@@ -139,7 +145,9 @@ class Jounery:
   
   def getPos(self, type):
     path = Template(r'D:\repo\auto-suml\screenshots\${type}.png')
-    return pyautogui.locateOnScreen(path.safe_substitute(type=type))
+    res = pyautogui.locateOnScreen(path.safe_substitute(type=type))
+    print(res, path.safe_substitute(type=type))
+    return res
   
   def randomClick(self):
     x1, y1, x2, y2 = AREA
@@ -148,8 +156,56 @@ class Jounery:
     seed = random()
     pyautogui.click(x1 + seed * offsetWidth, y1 + seed * offsetHeight)
 
-jounery = Jounery()
+# jounery = Jounery()
 
-while True:
-  time.sleep(1)
-  jounery.run()
+# while True:
+#   time.sleep(2)
+#   jounery.run()
+
+def getWindowSize(name = '战舰少女R - 标准引擎'):
+  hwnd = win32gui.FindWindow(None, name)
+
+  return win32gui.GetWindowRect(hwnd)
+
+  # width = right - left
+  # height = bottom - top
+  # return (width, height)
+
+NORMALIZE_LEFT = 280
+NORMALIZE_TOP = 90
+NORMALIZE_WIDTH = 2000
+NORMALIZE_HEIGHT = 1214
+
+
+rect = getWindowSize()
+
+def getScale(path):
+  left, top, right, bottom = rect
+  width = right - left
+  height = bottom - top
+  # leftOffset = NORMALIZE_LEFT - left
+  # topOffset = NORMALIZE_TOP - top
+  widthScale = width / NORMALIZE_WIDTH
+  heightScale = height / NORMALIZE_HEIGHT
+
+  img = cv2.imread(path)
+  oHeight, oWidth = img.shape[0], img.shape[1]
+  print(int(widthScale * oWidth), int(oHeight * heightScale))
+  out = cv2.resize(img, (int(widthScale * oWidth), int(heightScale * oHeight)))
+  
+  cv2.imwrite('./temp.png', out)
+
+  print(rect)
+  # scaleWidth = width / NORMALIZE_WIDTH
+  # scaleHeight = height / NORMALIZE_HEIGHT
+
+
+# res = pyautogui.locateOnScreen('D:/repo/auto-suml/screenshots/start.png')
+# getScale('./screenshots/start.png')
+# res = pyautogui.locateOnScreen('./temp.png', confidence=0.9)
+# center = pyautogui.center(res)
+# pyautogui.moveTo(center)
+# print(res)
+
+battle = Auto('9-1')
+battle.apply(['开始出征', '开始战斗', '单横阵', '追击?', '回港'])
