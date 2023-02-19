@@ -1,10 +1,8 @@
 import win32gui
-import configparser
+import toml
 
-config = configparser.ConfigParser()
-config.read('./config.ini')
-
+config = toml.load('./config.toml')
 def getWindowSize():
-  hwnd = win32gui.FindWindow(None, config.get('basic', 'title'))
+  hwnd = win32gui.FindWindow(None, config.get('basic')['title'])
   return win32gui.GetWindowRect(hwnd)
 
